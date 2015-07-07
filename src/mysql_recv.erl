@@ -1,3 +1,4 @@
+%% coding: latin-1
 %%%-------------------------------------------------------------------
 %%% File    : mysql_recv.erl
 %%% Author  : Fredrik Thulin <ft@it.su.se>
@@ -142,7 +143,7 @@ loop(State) ->
 	    LogFun = State#state.log_fun,
 	    LogFun(?MODULE, ?LINE, debug,
 		   fun() ->
-			   {"mysql_recv: Socket ~p closed", [Sock]}
+			   {"mysql_recv: Socket ~p closed: ~n Extra info: ~p", [Sock, State]}
 		   end),
 	    State#state.parent ! {mysql_recv, self(), closed, normal},
 	    error

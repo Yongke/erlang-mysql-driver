@@ -172,11 +172,11 @@ post_start(Pid, LogFun) ->
 	    % listener socket.
 	    ?Log2(LogFun, debug, "Ignoring message from process ~p | Reason: ~p",
 		  [OtherPid, Reason]),
-	    post_start(Pid, LogFun);
-	Unknown ->
-	    ?Log2(LogFun, error,
-		 "received unknown signal: ~p", [Unknown]),
-		 post_start(Pid, LogFun)
+	    post_start(Pid, LogFun)
+        %% Unknown ->
+        %%     ?Log2(LogFun, error,
+        %%           "received unknown signal: ~p", [Unknown]),
+        %%     post_start(Pid, LogFun)
     after 5000 ->
 	    {error, "timed out"}
     end.
@@ -265,6 +265,9 @@ do_recv(LogFun, RecvPid, SeqNum)  when is_function(LogFun);
     receive
         {mysql_recv, RecvPid, data, Packet, Num} ->
 	    {ok, Packet, Num};
+	{mysql_recv, _, closed, normal} = FwdMsg ->
+            self() ! FwdMsg,
+            {error, "socket closed"};
 	{mysql_recv, RecvPid, closed, _E} ->
 	    {error, io_lib:format("mysql_recv: socket was closed ~p", [_E])}
     end;
@@ -275,6 +278,9 @@ do_recv(LogFun, RecvPid, SeqNum) when is_function(LogFun);
     receive
         {mysql_recv, RecvPid, data, Packet, ResponseNum} ->
 	    {ok, Packet, ResponseNum};
+	{mysql_recv, _, closed, normal} = FwdMsg ->
+            self() ! FwdMsg,
+            {error, "socket closed"};
 	{mysql_recv, RecvPid, closed, _E} ->
 	    {error, io_lib:format("mysql_recv: socket was closed ~p", [_E])}
     end.

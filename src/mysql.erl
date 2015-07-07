@@ -1,3 +1,4 @@
+%% coding: latin-1
 %%% File    : mysql.erl
 %%% Author  : Magnus Ahltorp <ahltorp@nada.kth.se>
 %%% Descrip.: MySQL client.
@@ -487,7 +488,9 @@ get_result_affected_rows(#mysql_result{affectedrows=AffectedRows}) ->
 %% @spec get_result_reason(MySQLRes::mysql_result()) ->
 %%    Reason::string()
 get_result_reason(#mysql_result{error=Reason}) ->
-    Reason.
+    Reason;
+get_result_reason(Other) ->
+    lists:flatten(io_lib:format("Other reason: ~p", [Other])).
 
 %% @doc Extract the error ErrCode from MySQL Result on error
 %%
